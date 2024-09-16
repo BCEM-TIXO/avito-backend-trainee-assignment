@@ -1,2 +1,5 @@
-# avito-backend-trainee-assignment-
-avito-backend-trainee-assignment 
+# Запуск сервиса
+```
+cd src
+go run cmd/app/main.go
+```
