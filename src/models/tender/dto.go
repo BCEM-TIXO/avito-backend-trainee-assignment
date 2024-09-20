@@ -10,20 +10,6 @@ type CreateTenderDTO struct {
 	CreatorUsername string `json:"creatorUsername"`
 }
 
-type UpdateTenderDTO struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ServiceType string `json:"serviceType"`
-}
-
-func (t UpdateTenderDTO) ToTender() Tender {
-	return Tender{
-		Name:        t.Name,
-		Description: t.Description,
-		ServiceType: t.ServiceType,
-	}
-}
-
 func (t CreateTenderDTO) ToTender() Tender {
 	return Tender{
 		Name:           t.Name,
@@ -43,7 +29,7 @@ type TenderDTO struct {
 	CreatedAt   string `json:"createdAt"`
 }
 
-func ToTenderDTO(t Tender) TenderDTO {
+func (t Tender) ToTenderDTO() TenderDTO {
 	return TenderDTO{
 		Id:          t.Id,
 		Name:        t.Name,
@@ -58,7 +44,7 @@ func ToTenderDTO(t Tender) TenderDTO {
 func ToTenderDTOs(tenders []Tender) []TenderDTO {
 	dtos := make([]TenderDTO, len(tenders))
 	for i, tender := range tenders {
-		dtos[i] = ToTenderDTO(tender)
+		dtos[i] = tender.ToTenderDTO()
 	}
 	return dtos
 }

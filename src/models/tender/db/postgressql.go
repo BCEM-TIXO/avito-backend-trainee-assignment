@@ -91,6 +91,16 @@ func (r *repository) Update(ctx context.Context, t *tender.Tender, fields map[st
 	return err
 }
 
+func (r *repository) Rollback(ctx context.Context, id string, version int) error {
+	qb := r.psql.Select().From("rollback_tender_to_version('$1', $2)")
+	sql, _, err := qb.ToSql()
+	if err != nil {
+		return err
+	}
+	_, err = r.client.Exec(ctx, sql, id, version)
+	return err
+}
+
 func NewRepository(clinet postgresql.Client) tender.Repository {
 	return &repository{
 		client: clinet,

@@ -10,11 +10,11 @@ import (
 func RunMigrations(pool *pgxpool.Pool) error {
 	db := stdlib.OpenDBFromPool(pool)
 	goose.SetBaseFS(nil)
-
+	opts := goose.WithNoVersioning()
 	if err := goose.SetDialect("postgres"); err != nil {
 		panic(err)
 	}
-	if err := goose.Up(db, "migrations"); err != nil {
+	if err := goose.Up(db, "migrations", opts); err != nil {
 		panic(err)
 	}
 	if err := db.Close(); err != nil {

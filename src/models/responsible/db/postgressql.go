@@ -2,7 +2,6 @@ package responsible
 
 import (
 	"context"
-	"fmt"
 	"tender/models/responsible"
 	postgresql "tender/pkg/client"
 
@@ -20,8 +19,6 @@ func (r *repository) FindOne(ctx context.Context, userId string, orgId string) (
 	qb := sq.Select("id, organization_id, user_id").Distinct().From("organization_responsible").Where(sq.Eq{"user_id": userId, "organization_id": orgId})
 	qb = qb.PlaceholderFormat(sq.Dollar)
 	sql, args, _ := qb.ToSql()
-	fmt.Println(sql)
-	fmt.Println(args)
 	row := r.client.QueryRow(ctx, sql, args...)
 	var resp responsible.Responsible
 	err := row.Scan(&resp.Id, &resp.OrganizationId, &resp.UserId)

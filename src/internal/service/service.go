@@ -89,6 +89,8 @@ func (s Service) Run() {
 	tendersRouter.HandleFunc("/my", s.paginationMethodMW(s.GetMyTenders)).Methods("GET")
 	tendersRouter.HandleFunc("/{tenderId}/status", s.checkTenderId(s.GetTenderStatus)).Methods("GET")
 	tendersRouter.HandleFunc("/{tenderId}/status", s.checkTenderId(s.GetTenderStatus)).Methods("PUT")
+	tendersRouter.HandleFunc("/{tenderId}/edit", s.checkTenderId(s.GetTenderStatus)).Methods("PATCH")
+	tendersRouter.HandleFunc("/{tenderId}/rollback/{version}", s.checkTenderId(s.GetTenderStatus)).Methods("PUT")
 	tendersRouter.HandleFunc("/new", s.PostTender).Methods("POST")
 
 	bidsRouter := apiRouter.PathPrefix("/bids").Subrouter()

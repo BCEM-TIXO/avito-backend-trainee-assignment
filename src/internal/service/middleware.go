@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	repeatable "tender/pkg/utils"
@@ -75,7 +74,7 @@ func (s *Service) checkUserInDB(ctx context.Context, userName string) bool {
 
 func (s *Service) CheckUserAuth(ctx context.Context, userName string, orgId string) (bool, error) {
 	user, err := s.userRepo.FindOne(ctx, userName)
-	fmt.Println(user.Id, orgId)
+	// fmt.Println(user.Id, orgId)
 	if err != nil {
 		panic(err)
 		// return false, err

@@ -16,6 +16,5 @@ type Repository interface {
 	FindAll(ctx context.Context, qm *FindAllQueryModifier) ([]Tender, error)
 	FindOne(ctx context.Context, id string) (Tender, error)
 	Update(ctx context.Context, t *Tender, fields map[string]interface{}) error
-	// Create (ctx context.Context, tender Tender) (string, error)
-	// Create (ctx context.Context, tender Tender) (string, error)
+	Rollback(ctx context.Context, id string, version int) error
 }

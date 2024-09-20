@@ -2,7 +2,9 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 	"tender/models/tender"
 	repeatable "tender/pkg/utils"
 
@@ -181,18 +183,14 @@ func (s *Service) ChangeTenderStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) EditTender(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("JOAP")
 	ctx := r.Context()
-	var tenderDTO tender.UpdateTenderDTO
-	err := json.NewDecoder(r.Body).Decode(&tenderDTO)
-	if err != nil {
-		panic(err)
-	}
+	userName := r.URL.Query().Get("username")
+	tenderId := mux.Vars(r)["tenderId"]
 	var jsonData []byte
 	r.Body.Read(jsonData)
 	var fields map[string]interface{}
 	json.Unmarshal(jsonData, &fields)
-	userName := r.URL.Query().Get("username")
-	tenderId := mux.Vars(r)["tenderId"]
 
 	validUser, err := s.CheckUserAuth(ctx, userName, tenderId)
 	if !validUser {
@@ -201,10 +199,48 @@ func (s *Service) EditTender(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	var t tender.Tender
+	err = s.tenderRepo.Update(ctx, &t, fields)
+	if err != nil {
+		panic(err)
+	}
+	bytes, _ := json.Marshal(t.ToTenderDTO())
+	w.WriteHeader(http.StatusOK)
+	w.Write(bytes)
+}
 
-	updatedTender := tenderDTO.ToTender()
-	// s.tenderRepo.Update(ctx, &updatedTender)
-	bytes, _ := json.Marshal(updatedTender)
+func (s *Service) RollbackTender(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	var jsonData []byte
+	r.Body.Read(jsonData)
+	var fields map[string]interface{}
+	json.Unmarshal(jsonData, &fields)
+	userName := r.URL.Query().Get("username")
+	tenderId := mux.Vars(r)["tenderId"]
+	version, err := strconv.Atoi(mux.Vars(r)["version"])
+	if err != nil {
+		panic(err)
+	}
+	if version < 1 {
+		panic("Version < 1")
+	}
+
+	validUser, err := s.CheckUserAuth(ctx, userName, tenderId)
+	if !validUser {
+		panic("User invalid")
+	}
+	if err != nil {
+		panic(err)
+	}
+	err = s.tenderRepo.Rollback(ctx, tenderId, version)
+	if err != nil {
+		panic(err)
+	}
+	t, err := s.tenderRepo.FindOne(ctx, tenderId)
+	if err != nil {
+		panic(err)
+	}
+	bytes, _ := json.Marshal(t.ToTenderDTO())
 	w.WriteHeader(http.StatusOK)
 	w.Write(bytes)
 }
